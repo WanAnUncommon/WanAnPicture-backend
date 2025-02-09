@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.model.dto.user.UserQueryDTO;
 import com.example.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -113,5 +114,5 @@ public interface UserService extends IService<User> {
      * @param userQueryDTO 用户
      * @return 脱敏用户列表
      */
-    List<UserVO> queryUserByPage(UserQueryDTO userQueryDTO);
+    Page<UserVO> queryUserByPage(UserQueryDTO userQueryDTO);
 }

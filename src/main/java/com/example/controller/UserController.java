@@ -2,6 +2,7 @@ package com.example.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.annotation.AuthCheck;
 import com.example.common.BaseResponse;
 import com.example.common.ResultUtils;
@@ -146,8 +147,8 @@ public class UserController {
      */
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.USER_ROLE_ADMIN)
-    public BaseResponse<List<UserVO>> queryUserByPage(@RequestBody UserQueryDTO userQueryDTO) {
-        List<UserVO> userVOList = userService.queryUserByPage(userQueryDTO);
+    public BaseResponse<Page<UserVO>> queryUserByPage(@RequestBody UserQueryDTO userQueryDTO) {
+        Page<UserVO> userVOList = userService.queryUserByPage(userQueryDTO);
         return ResultUtils.success(userVOList);
     }
 }
