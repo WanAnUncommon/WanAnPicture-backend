@@ -20,3 +20,29 @@ create table if not exists user
     unique key uk_userAccount (userAccount),
     index idx_userName (userName)
 ) comment '用户表' collate = utf8mb4_unicode_ci;
+
+-- 图片表
+create table if not exists picture
+(
+    id          bigint auto_increment comment 'id' primary key,
+    url         varchar(512)                           not null comment '图片url',
+    name        varchar(255)                           not null comment '图片名称',
+    introduction varchar(255)                           null comment '图片简介',
+    category    varchar(64)                           null comment '图片分类',
+    tags        varchar(512)                           null comment '图片标签(Json数组)',
+    picSize     bigint                                  null comment '图片大小',
+    picWidth    int                                    null comment '图片宽度',
+    picHeight   int                                    null comment '图片高度',
+    picScale    double                            null comment '图片比例',
+    picFormat   varchar(32)                            null comment '图片格式',
+    userId      bigint                                 not null comment '创建用户id',
+    createTime  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    editTime    datetime     default CURRENT_TIMESTAMP not null comment '编辑时间',
+    updateTime  datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    deleted     tinyint      default 0                 not null comment '是否删除 0否 1是',
+    index idx_userId (userId),
+    index idx_category (category),
+    index idx_name (name),
+    index idx_tags (tags),
+    index idx_introduction (introduction)
+)comment '图片表' collate = utf8mb4_unicode_ci;
