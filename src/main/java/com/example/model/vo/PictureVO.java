@@ -86,6 +86,11 @@ public class PictureVO implements Serializable {
      */
     private Date editTime;
 
+    /**
+     * 创建用户
+     */
+    private UserVO userVO;
+
     private static final long serialVersionUID = 3908504123233497337L;
 
     /**

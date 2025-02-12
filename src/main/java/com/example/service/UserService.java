@@ -115,4 +115,12 @@ public interface UserService extends IService<User> {
      * @return 脱敏用户列表
      */
     Page<UserVO> queryUserByPage(UserQueryDTO userQueryDTO);
+
+    /**
+     * 是否为管理员
+     *
+     * @param user 用户
+     * @return 是否为管理员
+     */
+    boolean isAdmin(User user);
 }

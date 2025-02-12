@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author WanAn
  **/
 @Data
-public class PictureUploadDTO implements Serializable {
+public class PictureUploadRequest implements Serializable {
     private static final long serialVersionUID = 6517468443979095768L;
     private Long id;
 }

@@ -188,6 +188,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         userVOPage.setRecords(userVOList);
         return userVOPage;
     }
+
+    @Override
+    public boolean isAdmin(User user) {
+        if (user == null){
+            return false;
+        }
+        return UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
+    }
 }
 
 

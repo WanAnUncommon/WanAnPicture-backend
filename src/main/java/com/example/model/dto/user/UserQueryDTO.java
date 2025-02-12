@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserQueryDTO extends PageRequest {
+public class UserQueryDTO extends PageRequest implements Serializable{
     private static final long serialVersionUID = 8539375691193151757L;
     /**
      * id

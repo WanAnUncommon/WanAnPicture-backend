@@ -7,15 +7,11 @@ import java.io.Serializable;
 /**
  * 上传文件结果
  *
- * @author Wanwan
+ * @author WanAn
  */
 @Data
 public class UploadPictureResult implements Serializable {
     private static final long serialVersionUID = -6295298194400746441L;
-    /**
-     * id
-     */
-    private Long id;
 
     /**
      * 图片url
@@ -26,21 +22,6 @@ public class UploadPictureResult implements Serializable {
      * 图片名称
      */
     private String name;
-
-    /**
-     * 图片简介
-     */
-    private String introduction;
-
-    /**
-     * 图片分类
-     */
-    private String category;
-
-    /**
-     * 图片标签(Json数组)
-     */
-    private String tags;
 
     /**
      * 图片大小
@@ -66,11 +47,6 @@ public class UploadPictureResult implements Serializable {
      * 图片格式
      */
     private String picFormat;
-
-    /**
-     * 创建用户id
-     */
-    private Long userId;
 
 
 }
