@@ -64,7 +64,7 @@ public class FileManager {
             int height = imageInfo.getHeight();
             double scale = NumberUtil.round((1.0 * width) / height, 2).doubleValue();
             UploadPictureResult uploadPictureResult = new UploadPictureResult();
-            uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + uploadPath);
+            uploadPictureResult.setUrl("https://"+cosClientConfig.getHost() + "/" + uploadPath);
             uploadPictureResult.setName(FileUtil.mainName(originalFilename));
             uploadPictureResult.setPicSize(FileUtil.size(tempFile));
             uploadPictureResult.setPicWidth(width);

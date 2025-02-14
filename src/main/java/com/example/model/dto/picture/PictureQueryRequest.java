@@ -70,7 +70,7 @@ public class PictureQueryRequest extends PageRequest implements Serializable {
     /**
      * 搜索关键词
      */
-    private String searchTest;
+    private String searchText;
 
 
 }
