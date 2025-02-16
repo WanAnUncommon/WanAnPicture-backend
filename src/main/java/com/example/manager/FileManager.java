@@ -25,11 +25,13 @@ import java.util.List;
 
 /**
  * 文件存储服务
+ * 已废弃，请使用 {@link com.example.manager.upload.PictureUploadTemplate}
  *
  * @author WanAn
  */
 @Service
 @Slf4j
+@Deprecated
 public class FileManager {
     @Resource
     private CosClientConfig cosClientConfig;

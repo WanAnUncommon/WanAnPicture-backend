@@ -12,12 +12,10 @@ import com.example.constant.UserConstant;
 import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
-import com.example.model.dto.picture.PictureEditRequest;
-import com.example.model.dto.picture.PictureQueryRequest;
-import com.example.model.dto.picture.PictureUpdateRequest;
-import com.example.model.dto.picture.PictureUploadRequest;
+import com.example.model.dto.picture.*;
 import com.example.model.entity.Picture;
 import com.example.model.entity.User;
+import com.example.model.enums.PictureReviewStatusEnum;
 import com.example.model.vo.PictureTagCategoryVO;
 import com.example.model.vo.PictureVO;
 import com.example.service.PictureService;
@@ -56,7 +54,6 @@ public class PictureController {
      * @return 图片上传结果
      */
     @PostMapping("/upload")
-    @AuthCheck(mustRole = UserConstant.USER_ROLE_ADMIN)
     public BaseResponse<PictureVO> uploadPicture(@RequestPart("file") MultipartFile multipartFile, PictureUploadRequest pictureUploadRequest,
                                                  HttpServletRequest httpServletRequest) {
         User loginUser = userService.getLoginUser(httpServletRequest);
@@ -64,6 +61,29 @@ public class PictureController {
         return ResultUtils.success(pictureVO);
     }
 
+    /**
+     * 图片根据url上传
+     *
+     * @param pictureUploadRequest 图片上传信息
+     * @param httpServletRequest   request
+     * @return 图片上传结果
+     */
+    @PostMapping("/upload/url")
+    public BaseResponse<PictureVO> uploadPictureByUrl(PictureUploadRequest pictureUploadRequest,
+                                                 HttpServletRequest httpServletRequest) {
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        String fileUrl = pictureUploadRequest.getFileUrl();
+        PictureVO pictureVO = pictureService.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+        return ResultUtils.success(pictureVO);
+    }
+
+    /**
+     * 删除图片
+     *
+     * @param deleteRequest 图片删除信息
+     * @param request       request
+     * @return 删除结果
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deletePicture(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(deleteRequest), ErrorCode.PARAM_ERROR, "参数为空");
@@ -97,6 +117,9 @@ public class PictureController {
         Picture oldPicture = pictureService.getById(picture.getId());
         ThrowUtils.throwIf(ObjectUtil.isEmpty(oldPicture), ErrorCode.NOT_FOUND, "数据不存在");
         picture.setEditTime(new Date());
+        // 填充审核参数
+        User loginUser = userService.getLoginUser(request);
+        pictureService.fillReviewParams(picture, loginUser);
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "更新失败");
         return ResultUtils.success(result);
@@ -158,6 +181,8 @@ public class PictureController {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(pictureQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
         // 限制爬虫
         ThrowUtils.throwIf(pictureQueryRequest.getPageSize() > 50, ErrorCode.PARAM_ERROR, "参数过大");
+        // 只能查审核通过的
+        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
         Page<Picture> picturePage = pictureService.page(new Page<>(pictureQueryRequest.getCurrentPage(),
                         pictureQueryRequest.getPageSize()),
                 pictureService.getQueryWrapper(pictureQueryRequest));
@@ -180,12 +205,19 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         ThrowUtils.throwIf(!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser),
                 ErrorCode.NO_AUTH);
+        // 填充审核参数
+        pictureService.fillReviewParams(picture, loginUser);
         // 修改
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "更新失败");
         return ResultUtils.success(result);
     }
 
+    /**
+     * 获取标签分类
+     *
+     * @return 标签分类
+     */
     @GetMapping("/tag_category")
     public BaseResponse<PictureTagCategoryVO> getTagCategory() {
         List<String> categoryList = Arrays.asList("模版", "壁纸", "表情包", "美女", "风景", "二次元");
@@ -194,5 +226,14 @@ public class PictureController {
         pictureTagCategoryVO.setCategoryList(categoryList);
         pictureTagCategoryVO.setTagList(tagList);
         return ResultUtils.success(pictureTagCategoryVO);
+    }
+
+    @PostMapping("/review")
+    @AuthCheck(mustRole = UserConstant.USER_ROLE_ADMIN)
+    public BaseResponse<String> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(pictureReviewRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        User loginUser = userService.getLoginUser(request);
+        pictureService.doPictureReview(pictureReviewRequest, loginUser);
+        return ResultUtils.success("操作成功");
     }
 }

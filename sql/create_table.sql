@@ -46,3 +46,11 @@ create table if not exists picture
     index idx_tags (tags),
     index idx_introduction (introduction)
 )comment '图片表' collate = utf8mb4_unicode_ci;
+
+alter table picture
+    add column reviewStatus int default 0 not null comment '审核状态：0-待审核，1-通过，2-拒绝',
+    add column reviewMessage varchar(512) null comment '审核信息',
+    add column reviewerId bigint null comment '审核人id',
+    add column reviewTime datetime null comment '审核时间';
+
+create index idx_reviewStatus on picture (reviewStatus);

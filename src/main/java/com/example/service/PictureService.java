@@ -2,29 +2,30 @@ package com.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.model.dto.picture.PictureQueryRequest;
+import com.example.model.dto.picture.PictureReviewRequest;
 import com.example.model.dto.picture.PictureUploadRequest;
 import com.example.model.entity.Picture;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.model.entity.User;
 import com.example.model.vo.PictureVO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
-* @author lenovo
-* @description 针对表【picture(图片表)】的数据库操作Service
-* @createDate 2025-02-11 15:13:12
-*/
+ * 针对表【picture(图片表)】的数据库操作Service
+ *
+ * @author WanAn
+ */
 public interface PictureService extends IService<Picture> {
     /**
      * 上传图片
      *
-     * @param multipartFile 图片文件
+     * @param inputSource        图片文件输入源
      * @param pictureUploadRequest 图片上传请求体
-     * @param loginUser 登录用户
+     * @param loginUser            登录用户
      * @return 图片返回信息
      */
-    PictureVO uploadPicture(MultipartFile multipartFile, PictureUploadRequest pictureUploadRequest, User loginUser);
+    PictureVO uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser);
 
     /**
      * 获取查询条件
@@ -56,4 +57,20 @@ public interface PictureService extends IService<Picture> {
      * @param picture 图片
      */
     void validPicture(Picture picture);
+
+    /**
+     * 图片审核
+     *
+     * @param pictureReviewRequest 图片审核请求体
+     * @param loginUser            登录用户
+     */
+    void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser);
+
+    /**
+     * 填充审核参数
+     *
+     * @param picture   图片
+     * @param loginUser 登录用户
+     */
+    void fillReviewParams(Picture picture, User loginUser);
 }

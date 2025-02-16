@@ -13,4 +13,7 @@ import java.io.Serializable;
 public class PictureUploadRequest implements Serializable {
     private static final long serialVersionUID = 6517468443979095768L;
     private Long id;
+
+    // 图片地址
+    private String fileUrl;
 }
