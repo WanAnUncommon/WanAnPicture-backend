@@ -16,7 +16,7 @@ public class PageRequest implements Serializable {
     // 页大小
     private int pageSize = 10;
     // 排序字段
-    private String sortField;
-    // 排序顺序（默认升序）
+    private String sortField="editTime";
+    // 排序顺序（默认降序）
     private String sortOrder = "descend";
 }

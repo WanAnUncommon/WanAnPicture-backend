@@ -183,10 +183,7 @@ public class PictureController {
         ThrowUtils.throwIf(pictureQueryRequest.getPageSize() > 50, ErrorCode.PARAM_ERROR, "参数过大");
         // 只能查审核通过的
         pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
-        Page<Picture> picturePage = pictureService.page(new Page<>(pictureQueryRequest.getCurrentPage(),
-                        pictureQueryRequest.getPageSize()),
-                pictureService.getQueryWrapper(pictureQueryRequest));
-        Page<PictureVO> pictureVOPage = pictureService.getPictureVOPage(picturePage);
+        Page<PictureVO> pictureVOPage = pictureService.listPictureVOByPage(pictureQueryRequest);
         return ResultUtils.success(pictureVOPage);
     }
 
@@ -228,6 +225,12 @@ public class PictureController {
         return ResultUtils.success(pictureTagCategoryVO);
     }
 
+    /**
+     * 图片审核
+     *
+     * @param pictureReviewRequest 图片审核信息
+     * @return 成功
+     */
     @PostMapping("/review")
     @AuthCheck(mustRole = UserConstant.USER_ROLE_ADMIN)
     public BaseResponse<String> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest, HttpServletRequest request) {
@@ -235,5 +238,20 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         pictureService.doPictureReview(pictureReviewRequest, loginUser);
         return ResultUtils.success("操作成功");
+    }
+
+    /**
+     * 图片批量上传
+     *
+     * @param pictureUploadByBatchRequest 图片批量上传信息
+     * @return 成功上传的数量
+     */
+    @PostMapping("/upload/batch")
+    @AuthCheck(mustRole = UserConstant.USER_ROLE_ADMIN)
+    public BaseResponse<Integer> uploadPictureByBatch(@RequestBody PictureUploadByBatchRequest pictureUploadByBatchRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(pictureUploadByBatchRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        User loginUser = userService.getLoginUser(request);
+        Integer result = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
+        return ResultUtils.success(result);
     }
 }

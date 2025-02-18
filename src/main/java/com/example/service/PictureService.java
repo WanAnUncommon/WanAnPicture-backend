@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.model.dto.picture.PictureQueryRequest;
 import com.example.model.dto.picture.PictureReviewRequest;
+import com.example.model.dto.picture.PictureUploadByBatchRequest;
 import com.example.model.dto.picture.PictureUploadRequest;
 import com.example.model.entity.Picture;
 import com.example.model.entity.User;
 import com.example.model.vo.PictureVO;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -73,4 +75,21 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser 登录用户
      */
     void fillReviewParams(Picture picture, User loginUser);
+
+    /**
+     * 上传图片（批量）
+     *
+     * @param pictureUploadByBatchRequest 图片上传（批量）请求体
+     * @param loginUser                   登录用户
+     * @return 图片数量
+     */
+    Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser);
+
+    /**
+     * 获取图片分页信息（通过分页请求体）
+     *
+     * @param pictureQueryRequest 图片分页请求体
+     * @return 图片分页信息
+     */
+    Page<PictureVO> listPictureVOByPage(PictureQueryRequest pictureQueryRequest);
 }
