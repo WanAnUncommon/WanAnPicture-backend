@@ -60,11 +60,16 @@ public abstract class PictureUploadTemplate {
             // 获取图片处理结果
             ProcessResults processResults = putObjectResult.getCiUploadResult().getProcessResults();
             List<CIObject> objectList = processResults.getObjectList();
-            if (CollUtil.isNotEmpty(objectList)){
+            if (CollUtil.isNotEmpty(objectList)) {
                 // 获取压缩后的图片
                 CIObject compressedCiObject = objectList.get(0);
-                // 封装压缩图片返回结果
-                return buildResult(originalFilename, compressedCiObject);
+                // 获取缩略图对象
+                CIObject thumbnailCiObject = compressedCiObject;
+                if (objectList.size() > 1) {
+                    thumbnailCiObject = objectList.get(1);
+                }
+                // 封装返回结果
+                return buildResult(originalFilename, compressedCiObject, thumbnailCiObject);
             }
             // 构建文件信息
             ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
@@ -83,20 +88,22 @@ public abstract class PictureUploadTemplate {
      *
      * @param originalFilename 文件原始名称
      * @param compressedCiObject 压缩后的图片
+     * @param thumbnailCiObject 缩略图片
      * @return 文件信息
      */
-    private UploadPictureResult buildResult(String originalFilename, CIObject compressedCiObject) {
+    private UploadPictureResult buildResult(String originalFilename, CIObject compressedCiObject, CIObject thumbnailCiObject) {
         int width = compressedCiObject.getWidth();
         int height = compressedCiObject.getHeight();
         double scale = NumberUtil.round((1.0 * width) / height, 2).doubleValue();
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
-        uploadPictureResult.setUrl("https://" + cosClientConfig.getHost() + "/" + compressedCiObject);
+        uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + compressedCiObject.getKey());
         uploadPictureResult.setName(FileUtil.mainName(originalFilename));
         uploadPictureResult.setPicSize(compressedCiObject.getSize().longValue());
         uploadPictureResult.setPicWidth(width);
         uploadPictureResult.setPicHeight(height);
         uploadPictureResult.setPicScale(scale);
         uploadPictureResult.setPicFormat(compressedCiObject.getFormat());
+        uploadPictureResult.setThumbnailUrl(cosClientConfig.getHost() + "/" + thumbnailCiObject.getKey());
         return uploadPictureResult;
     }
 
@@ -114,7 +121,7 @@ public abstract class PictureUploadTemplate {
         int height = imageInfo.getHeight();
         double scale = NumberUtil.round((1.0 * width) / height, 2).doubleValue();
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
-        uploadPictureResult.setUrl("https://" + cosClientConfig.getHost() + "/" + uploadPath);
+        uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + uploadPath);
         uploadPictureResult.setName(FileUtil.mainName(originalFilename));
         uploadPictureResult.setPicSize(FileUtil.size(tempFile));
         uploadPictureResult.setPicWidth(width);

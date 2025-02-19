@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
+import com.example.manager.CosManager;
 import com.example.manager.upload.FilePictureUpload;
 import com.example.manager.upload.PictureUploadTemplate;
 import com.example.manager.upload.UrlPictureUpload;
@@ -36,6 +37,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -69,6 +71,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private CosManager cosManager;
 
     // 本地缓存
     private final Cache<String, String> LOCAL_CACHE = Caffeine.newBuilder()
@@ -106,6 +111,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 存入数据库
         Picture picture = new Picture();
         BeanUtil.copyProperties(uploadPictureResult, picture);
+        picture.setThumbnailUrl(uploadPictureResult.getThumbnailUrl());
         picture.setUserId(loginUser.getId());
         if (pictureUploadRequest != null && CharSequenceUtil.isNotBlank(pictureUploadRequest.getPicName())) {
             picture.setName(pictureUploadRequest.getPicName());
@@ -346,6 +352,24 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 写入本地缓存
         LOCAL_CACHE.put(hashKey, JSONUtil.toJsonStr(pictureVOPage));
         return pictureVOPage;
+    }
+
+    @Async
+    @Override
+    public void deletePicture(Picture picture) {
+        String url = picture.getUrl();
+        // 如果被其它图片引用，则不删除图片文件
+        Long count = this.lambdaQuery().eq(Picture::getUrl, url).count();
+        if (count > 1){
+            return;
+        }
+        // 删除图片文件
+        cosManager.deleteObject(url);
+        // 删除缩略图
+        String thumbnailUrl = picture.getThumbnailUrl();
+        if (CharSequenceUtil.isNotBlank(thumbnailUrl)){
+            cosManager.deleteObject(thumbnailUrl);
+        }
     }
 }
 

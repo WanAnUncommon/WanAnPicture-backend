@@ -92,4 +92,11 @@ public interface PictureService extends IService<Picture> {
      * @return 图片分页信息
      */
     Page<PictureVO> listPictureVOByPage(PictureQueryRequest pictureQueryRequest);
+
+    /**
+     * 删除图片
+     *
+     * @param picture 图片
+     */
+    void deletePicture(Picture picture);
 }

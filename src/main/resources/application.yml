@@ -2,6 +2,10 @@ server:
   port: 8123
   servlet:
     context-path: /api
+  reactive:
+    session:
+      cookie:
+        max-age: 2592000 # Cookie 30天过期
 spring:
   application:
     name: WanAnPicture-backend
@@ -15,6 +19,9 @@ spring:
     host: localhost
     port: 6379
     timeout: 5000
+  session:
+    store-type: redis
+    timeout: 2592000 # Session 30天过期
   profiles:
     active: local
   servlet:

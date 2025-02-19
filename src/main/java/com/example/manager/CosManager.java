@@ -58,6 +58,15 @@ public class CosManager {
         rule.setFileId(webpKey);
         rule.setRule("imageMogr2/format/webp");
         rules.add(rule);
+        // 缩略图处理,仅处理大于20KB的图片
+        if (file.length()>20*1024){
+            String thumbnailKey= FileUtil.mainName(key)+"_thumbnail"+FileUtil.getSuffix(key);
+            PicOperations.Rule thumbnailRule = new PicOperations.Rule();
+            thumbnailRule.setBucket(cosClientConfig.getBucket());
+            thumbnailRule.setFileId(thumbnailKey);
+            thumbnailRule.setRule(String.format("imageMogr2/thumbnail/%sx%s>",256,256));
+            rules.add(thumbnailRule);
+        }
         picOperations.setRules(rules);
         putObjectRequest.setPicOperations(picOperations);
         return cosClient.putObject(putObjectRequest);
@@ -71,5 +80,14 @@ public class CosManager {
     public COSObject getObject(String filePath) {
         GetObjectRequest getObjectRequest = new GetObjectRequest(cosClientConfig.getBucket(), filePath);
         return cosClient.getObject(getObjectRequest);
+    }
+
+    /**
+     * 删除对象
+     *
+     * @param key 唯一键
+     */
+    public void deleteObject(String key) {
+        cosClient.deleteObject(cosClientConfig.getBucket(), key);
     }
 }

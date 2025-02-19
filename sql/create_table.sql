@@ -54,3 +54,6 @@ alter table picture
     add column reviewTime datetime null comment '审核时间';
 
 create index idx_reviewStatus on picture (reviewStatus);
+
+alter table picture
+    add column thumbnailUrl varchar(512) null comment '缩略图url';
