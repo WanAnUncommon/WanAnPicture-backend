@@ -12,6 +12,8 @@ import java.io.Serializable;
 @Data
 public class PictureUploadRequest implements Serializable {
     private static final long serialVersionUID = 6517468443979095768L;
+
+    // 图片id
     private Long id;
 
     // 图片地址
@@ -19,4 +21,7 @@ public class PictureUploadRequest implements Serializable {
 
     // 图片名称
     private String picName;
+
+    // 空间id
+    private Long spaceId;
 }

@@ -3,15 +3,11 @@ package com.example.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.model.dto.picture.PictureQueryRequest;
-import com.example.model.dto.picture.PictureReviewRequest;
-import com.example.model.dto.picture.PictureUploadByBatchRequest;
-import com.example.model.dto.picture.PictureUploadRequest;
+import com.example.common.DeleteRequest;
+import com.example.model.dto.picture.*;
 import com.example.model.entity.Picture;
 import com.example.model.entity.User;
 import com.example.model.vo.PictureVO;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 针对表【picture(图片表)】的数据库操作Service
@@ -22,7 +18,7 @@ public interface PictureService extends IService<Picture> {
     /**
      * 上传图片
      *
-     * @param inputSource        图片文件输入源
+     * @param inputSource          图片文件输入源
      * @param pictureUploadRequest 图片上传请求体
      * @param loginUser            登录用户
      * @return 图片返回信息
@@ -51,7 +47,7 @@ public interface PictureService extends IService<Picture> {
      * @param picturePage 图片分页信息
      * @return 图片分页信息
      */
-    Page<PictureVO> getPictureVOPage(Page<Picture> picturePage);
+    Page<PictureVO> getPictureVoPage(Page<Picture> picturePage);
 
     /**
      * 校验图片
@@ -91,12 +87,37 @@ public interface PictureService extends IService<Picture> {
      * @param pictureQueryRequest 图片分页请求体
      * @return 图片分页信息
      */
-    Page<PictureVO> listPictureVOByPage(PictureQueryRequest pictureQueryRequest);
+    Page<PictureVO> listPictureVoByPage(PictureQueryRequest pictureQueryRequest);
+
+    /**
+     * 删除对象存储中的图片
+     *
+     * @param picture 图片
+     */
+    void deleteCosPicture(Picture picture);
 
     /**
      * 删除图片
      *
-     * @param picture 图片
+     * @param deleteRequest 删除请求体
+     * @param loginUser     登录用户
+     * @return 是否删除成功
      */
-    void deletePicture(Picture picture);
+    boolean deletePicture(DeleteRequest deleteRequest,User loginUser);
+
+    /**
+     * 校验图片权限
+     *
+     * @param loginUser 登录用户
+     * @param picture   图片
+     */
+    void checkPictureAuth(User loginUser,Picture picture);
+
+    /**
+     * 编辑图片
+     *
+     * @param pictureEditRequest 图片编辑请求体
+     * @param loginUser          登录用户
+     */
+    boolean editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 }
