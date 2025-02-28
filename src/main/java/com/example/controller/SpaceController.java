@@ -160,8 +160,8 @@ public class SpaceController {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
         // 限制爬虫
         ThrowUtils.throwIf(spaceQueryRequest.getPageSize() > 50, ErrorCode.PARAM_ERROR, "参数过大");
-        Page<SpaceVO> spaceVOPage = spaceService.listSpaceVOByPage(spaceQueryRequest);
-        return ResultUtils.success(spaceVOPage);
+        Page<SpaceVO> spaceVoPage = spaceService.listSpaceVOByPage(spaceQueryRequest);
+        return ResultUtils.success(spaceVoPage);
     }
 
     @PostMapping("/edit")

@@ -75,9 +75,10 @@ public interface SpaceService extends IService<Space> {
     Page<SpaceVO> listSpaceVOByPage(SpaceQueryRequest spaceQueryRequest);
 
     /**
-     * 删除空间
+     * 获取空间分页信息（通过分页信息）
      *
-     * @param space 空间
+     * @param spacePage 空间分页信息
+     * @return 空间分页信息
      */
-    void deleteSpace(Space space);
+    Page<SpaceVO> getSpaceVoPage(Page<Space> spacePage);
 }

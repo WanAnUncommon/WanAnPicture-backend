@@ -428,13 +428,15 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             boolean result = this.removeById(pictureId);
             ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除失败");
             // 更新空间额度
-            boolean update = spaceService.lambdaUpdate().eq(Space::getId, picture.getSpaceId())
-                    .setSql("totalSize=totalSize-" + picture.getPicSize())
-                    .setSql("totalCount=totalCount-1").update();
-            ThrowUtils.throwIf(!update, ErrorCode.SYSTEM_ERROR, "删除文件失败，数据库异常");
+            if (picture.getSpaceId() != null){
+                boolean update = spaceService.lambdaUpdate().eq(Space::getId, picture.getSpaceId())
+                        .setSql("totalSize=totalSize-" + picture.getPicSize())
+                        .setSql("totalCount=totalCount-1").update();
+                ThrowUtils.throwIf(!update, ErrorCode.SYSTEM_ERROR, "删除文件失败，数据库异常");
+            }
             // 异步清理文件
             this.deleteCosPicture(picture);
-            return update;
+            return result;
         });
         return true;
     }
