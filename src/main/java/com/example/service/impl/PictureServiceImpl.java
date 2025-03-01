@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,11 +35,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -48,7 +45,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -157,11 +153,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             boolean save = this.saveOrUpdate(picture);
             ThrowUtils.throwIf(!save, ErrorCode.SYSTEM_ERROR, "上传文件失败，数据库异常");
             // 更新空间额度
-            boolean update = spaceService.lambdaUpdate().eq(Space::getId, finalSpaceId)
-                    .setSql("totalSize=totalSize+" + picture.getPicSize())
-                    .setSql("totalCount=totalCount+1").update();
-            ThrowUtils.throwIf(!update, ErrorCode.SYSTEM_ERROR, "上传文件失败，数据库异常");
-            return update;
+            if (finalSpaceId != null) {
+                // 更新空间额度
+                boolean update = spaceService.lambdaUpdate().eq(Space::getId, finalSpaceId)
+                        .setSql("totalSize=totalSize+" + picture.getPicSize())
+                        .setSql("totalCount=totalCount+1").update();
+                ThrowUtils.throwIf(!update, ErrorCode.SYSTEM_ERROR, "上传文件失败，数据库异常");
+            }
+            return save;
         });
         // 脱敏
         return PictureVO.objToVo(picture);
@@ -361,7 +360,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Override
     public Page<PictureVO> listPictureVoByPage(PictureQueryRequest pictureQueryRequest) {
-        // 先查询缓存
+        /*// 先查询缓存
         // 构建缓存key
         String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
         String hashKey = DigestUtils.md5DigestAsHex(String.format("WanAnPicture:listPictureVOByPage:%s", queryCondition).getBytes());
@@ -379,18 +378,18 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             // 写入本地缓存
             LOCAL_CACHE.put(hashKey, cacheValue);
             return JSONUtil.toBean(cacheValue, Page.class);
-        }
+        }*/
         // 缓存都未命中,查询数据库
         Page<Picture> picturePage = this.page(new Page<>(pictureQueryRequest.getCurrentPage(),
                         pictureQueryRequest.getPageSize()),
                 this.getQueryWrapper(pictureQueryRequest));
         Page<PictureVO> pictureVOPage = this.getPictureVoPage(picturePage);
-        // 缓存结果
+        /*// 缓存结果
         // 写入Redis，设置缓存过期时间为5-10分钟，避免缓存雪崩
         int expireTime = 300 + RandomUtil.randomInt(0, 300);
         cacheMap.set(hashKey, JSONUtil.toJsonStr(pictureVOPage), expireTime, TimeUnit.SECONDS);
         // 写入本地缓存
-        LOCAL_CACHE.put(hashKey, JSONUtil.toJsonStr(pictureVOPage));
+        LOCAL_CACHE.put(hashKey, JSONUtil.toJsonStr(pictureVOPage));*/
         return pictureVOPage;
     }
 
@@ -428,7 +427,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             boolean result = this.removeById(pictureId);
             ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除失败");
             // 更新空间额度
-            if (picture.getSpaceId() != null){
+            if (picture.getSpaceId() != null) {
                 boolean update = spaceService.lambdaUpdate().eq(Space::getId, picture.getSpaceId())
                         .setSql("totalSize=totalSize-" + picture.getPicSize())
                         .setSql("totalCount=totalCount-1").update();
