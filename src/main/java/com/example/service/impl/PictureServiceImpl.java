@@ -190,6 +190,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Long reviewerId = pictureQueryRequest.getReviewerId();
         Long spaceId = pictureQueryRequest.getSpaceId();
         boolean nullSpaceId = pictureQueryRequest.isNullSpaceId();
+        Date startEditTime = pictureQueryRequest.getStartEditTime();
+        Date endEditTime = pictureQueryRequest.getEndEditTime();
 
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.like(CharSequenceUtil.isNotBlank(name), "name", name);
@@ -217,6 +219,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                 qw.like("introduction", searchTest);
             });
         }
+        queryWrapper.ge(startEditTime != null, "editTime", startEditTime);
+        queryWrapper.lt(endEditTime != null, "editTime", endEditTime);
         queryWrapper.orderBy(CharSequenceUtil.isNotBlank(sortField), "ascend".equals(sortOrder), sortField);
         return queryWrapper;
     }
