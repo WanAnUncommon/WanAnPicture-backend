@@ -71,9 +71,7 @@ public class SpaceController {
         // 校验只能自己删或者管理员删
         User loginUser = userService.getLoginUser(request);
         Space space = spaceService.getById(deleteRequest.getId());
-        if (!loginUser.getId().equals(space.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH);
-        }
+        spaceService.checkSpaceAuth(loginUser, space);
         boolean result = spaceService.removeById(deleteRequest.getId());
         ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除失败");
         return ResultUtils.success(result);
@@ -177,8 +175,7 @@ public class SpaceController {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(oldSpace), ErrorCode.NOT_FOUND, "数据不存在");
         // 只有本人和管理员可以修改
         User loginUser = userService.getLoginUser(request);
-        ThrowUtils.throwIf(!oldSpace.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser),
-                ErrorCode.NO_AUTH);
+        spaceService.checkSpaceAuth(loginUser, oldSpace);
         // 修改
         boolean result = spaceService.updateById(space);
         ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "更新失败");

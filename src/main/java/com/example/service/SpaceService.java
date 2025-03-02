@@ -81,4 +81,12 @@ public interface SpaceService extends IService<Space> {
      * @return 空间分页信息
      */
     Page<SpaceVO> getSpaceVoPage(Page<Space> spacePage);
+
+    /**
+     * 校验空间权限
+     *
+     * @param loginUser 登录用户
+     * @param space 空间
+     */
+    void checkSpaceAuth(User loginUser, Space space);
 }
