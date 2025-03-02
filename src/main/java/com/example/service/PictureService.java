@@ -120,4 +120,13 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser          登录用户
      */
     boolean editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 编辑图片（批量）
+     *
+     * @param pictureEditByBatchRequest 图片编辑（批量）请求体
+     * @param loginUser                 登录用户
+     * @return 是否编辑成功
+     */
+    boolean editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 }

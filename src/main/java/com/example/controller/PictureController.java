@@ -254,4 +254,17 @@ public class PictureController {
         Integer result = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(result);
     }
+
+    /**
+     * 图片批量编辑
+     *
+     * @param pictureEditByBatchRequest 图片批量编辑信息
+     * @return 成功
+     */
+    @PostMapping("/edit/batch")
+    public BaseResponse<Boolean> editPictureByBatch(@RequestBody PictureEditByBatchRequest pictureEditByBatchRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(ObjectUtil.isEmpty(pictureEditByBatchRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        boolean result = pictureService.editPictureByBatch(pictureEditByBatchRequest, userService.getLoginUser(request));
+        return ResultUtils.success(result);
+    }
 }

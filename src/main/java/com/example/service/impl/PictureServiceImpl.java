@@ -45,6 +45,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -478,6 +479,65 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         boolean result = this.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "更新失败");
         return result;
+    }
+
+    @Override
+    public boolean editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser) {
+        // 参数校验
+        List<Long> pictureIdList = pictureEditByBatchRequest.getPictureIdList();
+        Long spaceId = pictureEditByBatchRequest.getSpaceId();
+        String category = pictureEditByBatchRequest.getCategory();
+        List<String> tags = pictureEditByBatchRequest.getTags();
+        ThrowUtils.throwIf(CollUtil.isEmpty(pictureIdList), ErrorCode.PARAM_ERROR, "图片id列表不能为空");
+        ThrowUtils.throwIf(ObjectUtil.isNull(loginUser), ErrorCode.NOT_LOGIN);
+        ThrowUtils.throwIf(ObjectUtil.isNull(spaceId), ErrorCode.PARAM_ERROR, "空间id不能为空");
+        // 空间是否存在
+        Space space = spaceService.getById(spaceId);
+        ThrowUtils.throwIf(ObjectUtil.isNull(space), ErrorCode.PARAM_ERROR, "空间不存在");
+        // 权限校验
+        if (!space.getUserId().equals(loginUser.getId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        // 查询图片
+        List<Picture> pictureList = this.lambdaQuery().select(Picture::getId, Picture::getSpaceId).in(Picture::getId, pictureIdList)
+                .eq(Picture::getSpaceId, spaceId).list();
+        // 更新分类和标签
+        pictureList.forEach(picture -> {
+            if (CharSequenceUtil.isNotBlank(category)) {
+                picture.setCategory(category);
+            }
+            if (CollUtil.isNotEmpty(tags)) {
+                picture.setTags(JSONUtil.toJsonStr(tags));
+            }
+        });
+        // 更新名称
+        fillPictureNameByNameRule(pictureList, pictureEditByBatchRequest.getNameRule());
+        // 操作数据库
+        boolean result = this.updateBatchById(pictureList);
+        ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "更新失败");
+        return result;
+    }
+
+    /**
+     * 根据名称规则更新图片名称
+     *
+     * @param pictureList 图片列表
+     * @param nameRule    名称规则: 名称{序号}
+     */
+    private void fillPictureNameByNameRule(List<Picture> pictureList, String nameRule) {
+        if (CharSequenceUtil.isBlank(nameRule) || CollUtil.isEmpty(pictureList)) {
+            return;
+        }
+        AtomicLong count = new AtomicLong();
+        try {
+            pictureList.forEach(picture -> {
+                String name = nameRule.replaceAll("\\{序号}", String.valueOf(count.getAndIncrement()));
+                picture.setName(name);
+            });
+        } catch (Exception e) {
+            log.error("名称规则错误:{}", nameRule);
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "名称规则错误");
+        }
     }
 }
 
