@@ -233,4 +233,18 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
             return new SpaceAnalyzeUserResponse(period, count);
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<Space> getSpaceAnalyzeRank(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, User loginUser) {
+        // 参数校验
+        ThrowUtils.throwIf(ObjectUtil.isNull(spaceRankAnalyzeRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        // 权限校验
+        ThrowUtils.throwIf(userService.isAdmin(loginUser), ErrorCode.NO_AUTH);
+        // 构造查询条件
+        QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "spaceName", "userId", "totalSize")
+                .orderByDesc("totalSize")
+                .last("limit " + spaceRankAnalyzeRequest.getTopN());
+        return spaceService.list(queryWrapper);
+    }
 }

@@ -58,4 +58,13 @@ public interface SpaceAnalyzeService extends IService<Space> {
      * @return 空间用户情况
      */
     List<SpaceAnalyzeUserResponse> getSpaceAnalyzeUser(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser);
+
+    /**
+     * 获取空间排行情况
+     *
+     * @param spaceRankAnalyzeRequest 空间排行分析请求
+     * @param loginUser               登录用户
+     * @return 空间排行情况
+     */
+    List<Space> getSpaceAnalyzeRank(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest,User loginUser);
 }

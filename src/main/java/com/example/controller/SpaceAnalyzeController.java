@@ -1,11 +1,13 @@
 package com.example.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.example.annotation.AuthCheck;
 import com.example.common.BaseResponse;
 import com.example.common.ResultUtils;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
 import com.example.model.dto.space.analyze.*;
+import com.example.model.entity.Space;
 import com.example.model.entity.User;
 import com.example.model.vo.*;
 import com.example.service.SpaceAnalyzeService;
@@ -112,6 +114,23 @@ public class SpaceAnalyzeController {
         ThrowUtils.throwIf(ObjectUtil.isNull(spaceUserAnalyzeRequest), ErrorCode.PARAM_ERROR, "参数为空");
         User loginUser = userService.getLoginUser(request);
         List<SpaceAnalyzeUserResponse> responseList = spaceAnalyzeService.getSpaceAnalyzeUser(spaceUserAnalyzeRequest, loginUser);
+        return ResultUtils.success(responseList);
+    }
+
+    /**
+     * 获取空间排名情况
+     *
+     * @param spaceRankAnalyzeRequest 请求体
+     * @param request                 HttpServletRequest
+     * @return 空间排名情况
+     */
+    @PostMapping("/rank")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<List<Space>> getSpaceAnalyzeRank(
+            @RequestBody SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(ObjectUtil.isNull(spaceRankAnalyzeRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        User loginUser = userService.getLoginUser(request);
+        List<Space> responseList = spaceAnalyzeService.getSpaceAnalyzeRank(spaceRankAnalyzeRequest, loginUser);
         return ResultUtils.success(responseList);
     }
 }
