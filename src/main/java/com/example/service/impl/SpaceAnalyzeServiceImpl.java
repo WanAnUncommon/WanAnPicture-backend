@@ -148,8 +148,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         queryWrapper.groupBy("category");
         return pictureService.getBaseMapper().selectMaps(queryWrapper).stream().map(result -> {
             String category = (String) result.get("category");
-            Long count = (Long) result.get("count");
-            Long totalSize = (Long) result.get("totalSize");
+            Long count = ((Number) result.get("count")).longValue();
+            Long totalSize = ((Number) result.get("totalSize")).longValue();
             return new SpaceAnalyzeCategoryResponse(category, count, totalSize);
         }).collect(Collectors.toList());
     }
@@ -161,7 +161,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         // 构造查询条件
         QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
         fillAnalyzeQueryWrapper(spaceTagAnalyzeRequest, queryWrapper);
-        queryWrapper.select("tag");
+        queryWrapper.select("tags");
         // 查询所有符合条件的tag
         List<String> tagJsonList = pictureService.getBaseMapper().selectObjs(queryWrapper).stream().filter(ObjectUtil::isNotNull)
                 .map(Object::toString).collect(Collectors.toList());
@@ -228,8 +228,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         queryWrapper.groupBy("period").orderByAsc("period");
         // 封装返回结果
         return pictureService.getBaseMapper().selectMaps(queryWrapper).stream().map(result -> {
-            String period = (String) result.get("period");
-            Long count = (Long) result.get("count");
+            String period = result.get("period").toString();
+            Long count = ((Number) result.get("count")).longValue();
             return new SpaceAnalyzeUserResponse(period, count);
         }).collect(Collectors.toList());
     }
@@ -239,7 +239,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         // 参数校验
         ThrowUtils.throwIf(ObjectUtil.isNull(spaceRankAnalyzeRequest), ErrorCode.PARAM_ERROR, "参数为空");
         // 权限校验
-        ThrowUtils.throwIf(userService.isAdmin(loginUser), ErrorCode.NO_AUTH);
+        ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH);
         // 构造查询条件
         QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "spaceName", "userId", "totalSize")
