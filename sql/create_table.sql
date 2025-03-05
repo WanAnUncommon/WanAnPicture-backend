@@ -81,3 +81,20 @@ create table if not exists space
 alter table picture
     add column spaceId bigint null comment '空间id(为空代表公共空间)';
 create index idx_spaceId on picture (spaceId);
+
+alter table space
+    add column spaceType int default 0 not null comment '空间类型：0-私有空间，1-团队空间';
+create index idx_spaceType on space (spaceType);
+
+create table if not exists space_user
+(
+    id          bigint auto_increment comment 'id' primary key,
+    spaceId     bigint                                 not null comment '空间id',
+    userId      bigint                                 not null comment '用户id',
+    spaceRole varchar(128) default 'viewer' not null comment '空间角色：viewer-浏览者，editor-编辑者，admin-管理员',
+    createTime  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime  datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    unique key uk_spaceId_userId (spaceId, userId),
+    index idx_spaceId (spaceId),
+    index idx_userId (userId)
+)comment '空间成员表' collate = utf8mb4_unicode_ci;

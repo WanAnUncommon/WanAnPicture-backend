@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.constant.UserConstant;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
+import com.example.manager.auth.StpKit;
 import com.example.mapper.UserMapper;
 import com.example.model.dto.user.UserQueryDTO;
 import com.example.model.entity.User;
@@ -74,6 +76,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         LoginUserVO loginUserVO = getLoginUserVO(user);
         // 保存用户登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, loginUserVO);
+        // Sa-Token登录
+        StpKit.SPACE.login(user.getId());
+        StpUtil.getSession().set(UserConstant.USER_LOGIN_STATE, loginUserVO);
         return loginUserVO;
     }
 

@@ -44,10 +44,10 @@ public enum SpaceLevelEnum {
         if (ObjectUtil.isEmpty(value)) {
             return null;
         }
-        for (SpaceLevelEnum pictureReviewStatusEnum :
+        for (SpaceLevelEnum spaceLevelEnum :
                 SpaceLevelEnum.values()) {
-            if (pictureReviewStatusEnum.value == value) {
-                return pictureReviewStatusEnum;
+            if (spaceLevelEnum.value == value) {
+                return spaceLevelEnum;
             }
         }
         return null;

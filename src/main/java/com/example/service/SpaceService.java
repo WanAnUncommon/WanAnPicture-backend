@@ -2,12 +2,10 @@ package com.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.model.dto.picture.PictureQueryRequest;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.model.dto.space.SpaceAddRequest;
 import com.example.model.dto.space.SpaceQueryRequest;
-import com.example.model.entity.Picture;
 import com.example.model.entity.Space;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.model.entity.User;
 import com.example.model.vo.SpaceVO;
 
@@ -22,7 +20,7 @@ public interface SpaceService extends IService<Space> {
      * 添加空间
      *
      * @param spaceAddRequest 空间添加请求体
-     * @param loginUser 登录用户
+     * @param loginUser       登录用户
      * @return 空间ID
      */
     Long addSpace(SpaceAddRequest spaceAddRequest, User loginUser);
@@ -31,9 +29,9 @@ public interface SpaceService extends IService<Space> {
      * 校验空间
      *
      * @param space 空间
-     * @param add 是否为添加操作
+     * @param add   是否为添加操作
      */
-    void validSpace(Space space,boolean add);
+    void validSpace(Space space, boolean add);
 
     /**
      * 获取查询条件
@@ -86,7 +84,7 @@ public interface SpaceService extends IService<Space> {
      * 校验空间权限
      *
      * @param loginUser 登录用户
-     * @param space 空间
+     * @param space     空间
      */
     void checkSpaceAuth(User loginUser, Space space);
 }
