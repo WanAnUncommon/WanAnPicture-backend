@@ -11,6 +11,7 @@ import com.example.constant.UserConstant;
 import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
+import com.example.manager.auth.SpaceUserAuthManager;
 import com.example.model.dto.space.*;
 import com.example.model.entity.Space;
 import com.example.model.entity.User;
@@ -42,6 +43,9 @@ public class SpaceController {
     private SpaceService spaceService;
     @Resource
     private UserService userService;
+
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 添加空间
@@ -124,11 +128,13 @@ public class SpaceController {
      * @return 空间信息
      */
     @GetMapping("/get/vo")
-    public BaseResponse<SpaceVO> getSpaceVOById(long id) {
+    public BaseResponse<SpaceVO> getSpaceVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAM_ERROR);
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(ObjectUtil.isEmpty(space), ErrorCode.NOT_FOUND, "数据不存在");
         SpaceVO spaceVO = spaceService.getSpaceVO(space);
+        // 填充权限列表
+        spaceVO.setPermissionList(spaceUserAuthManager.getPermissionList(space, userService.getLoginUser(request)));
         return ResultUtils.success(spaceVO);
     }
 

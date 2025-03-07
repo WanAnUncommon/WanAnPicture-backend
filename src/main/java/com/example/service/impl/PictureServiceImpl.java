@@ -424,8 +424,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(pictureId <= 0, ErrorCode.PARAM_ERROR, "图片id异常");
         Picture picture = this.getById(pictureId);
         ThrowUtils.throwIf(ObjectUtil.isNull(picture), ErrorCode.NOT_FOUND, "图片不存在");
-        // 校验权限
-        this.checkPictureAuth(loginUser, picture);
         // 事务
         transactionTemplate.execute(status -> {
             // 操作数据库
@@ -471,8 +469,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 校验是否存在
         Picture oldPicture = this.getById(picture.getId());
         ThrowUtils.throwIf(ObjectUtil.isEmpty(oldPicture), ErrorCode.NOT_FOUND, "数据不存在");
-        // 权限校验
-        this.checkPictureAuth(loginUser, oldPicture);
         // 填充审核参数
         this.fillReviewParams(picture, loginUser);
         // 修改

@@ -81,6 +81,13 @@
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- 分库分表 -->
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>

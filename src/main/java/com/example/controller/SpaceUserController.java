@@ -7,6 +7,8 @@ import com.example.common.DeleteRequest;
 import com.example.common.ResultUtils;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
+import com.example.manager.auth.annotation.SaSpaceCheckPermission;
+import com.example.manager.auth.model.SpaceUserPermissionConstant;
 import com.example.model.dto.spaceuser.SpaceUserAddRequest;
 import com.example.model.dto.spaceuser.SpaceUserEditRequest;
 import com.example.model.dto.spaceuser.SpaceUserQueryRequest;
@@ -31,7 +33,7 @@ import java.util.List;
  * @author WanAn
  */
 @RestController
-@RequestMapping("/space")
+@RequestMapping("/spaceuser")
 @Slf4j
 public class SpaceUserController {
 
@@ -47,6 +49,7 @@ public class SpaceUserController {
      * @return 空间用户id
      */
     @PostMapping("/add")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Long> addSpaceUser(@RequestBody SpaceUserAddRequest spaceUserAddRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceUserAddRequest), ErrorCode.PARAM_ERROR, "参数为空");
         Long spaceUserId = spaceUserService.addSpaceUser(spaceUserAddRequest);
@@ -60,6 +63,7 @@ public class SpaceUserController {
      * @return 删除结果
      */
     @PostMapping("/delete")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Boolean> deleteSpaceUser(@RequestBody DeleteRequest deleteRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(deleteRequest), ErrorCode.PARAM_ERROR, "参数为空");
         // 数据是否存在
@@ -77,6 +81,7 @@ public class SpaceUserController {
      * @return 空间用户信息
      */
     @PostMapping("/get")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<SpaceUser> getSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceUserQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
         Long userId = spaceUserQueryRequest.getUserId();
@@ -94,6 +99,7 @@ public class SpaceUserController {
      * @return 空间用户列表
      */
     @PostMapping("/list")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<List<SpaceUserVO>> listSpaceUserVOList(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceUserQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
         List<SpaceUser> spaceUserList = spaceUserService.list(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
@@ -124,6 +130,7 @@ public class SpaceUserController {
      * @return 更新结果
      */
     @PostMapping("/edit")
+    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Boolean> editSpaceUser(@RequestBody SpaceUserEditRequest spaceUserEditRequest) {
         ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceUserEditRequest), ErrorCode.PARAM_ERROR, "参数为空");
         SpaceUser spaceUser = new SpaceUser();

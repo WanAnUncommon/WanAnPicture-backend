@@ -5,7 +5,9 @@ import com.example.model.entity.Space;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 空间视图
@@ -73,6 +75,9 @@ public class SpaceVO implements Serializable {
      * 创建用户
      */
     private UserVO userVO;
+
+    // 权限列表
+    private List<String> permissionList=new ArrayList<>();
 
     private static final long serialVersionUID = 6639265439739795479L;
 

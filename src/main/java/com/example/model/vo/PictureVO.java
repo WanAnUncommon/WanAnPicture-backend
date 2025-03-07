@@ -6,6 +6,7 @@ import com.example.model.entity.Picture;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -100,6 +101,9 @@ public class PictureVO implements Serializable {
      * 创建用户
      */
     private UserVO userVO;
+
+    // 权限列表
+    private List<String> permissionList=new ArrayList<>();
 
     private static final long serialVersionUID = 3908504123233497337L;
 
