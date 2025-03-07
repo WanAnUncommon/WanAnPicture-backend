@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
+import com.example.manager.sharding.DynamicShardingManager;
 import com.example.mapper.SpaceMapper;
 import com.example.model.dto.space.SpaceAddRequest;
 import com.example.model.dto.space.SpaceQueryRequest;
@@ -49,6 +50,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
     @Resource
     private SpaceUserService spaceUserService;
+
+//    @Resource
+//    private DynamicShardingManager dynamicShardingManager;
 
     @Override
     public Long addSpace(SpaceAddRequest spaceAddRequest, User loginUser) {
@@ -94,6 +98,8 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
                     result = spaceUserService.save(spaceUser);
                     ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "插入团队用户失败");
                 }
+                // 创建分表
+//                dynamicShardingManager.createSpacePictureTable(space);
                 return space.getId();
             });
             return Optional.ofNullable(newSpaceId).orElse(-1L);

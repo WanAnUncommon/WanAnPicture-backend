@@ -1,5 +1,6 @@
 package com.example;
 
+import org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  *
  * @author WanAn
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {ShardingSphereAutoConfiguration.class})
 @MapperScan("com.example.mapper")
 @EnableAspectJAutoProxy(exposeProxy = true)
 @EnableAsync
