@@ -10,7 +10,6 @@ import com.example.model.entity.SpaceUser;
 import com.example.model.entity.User;
 import com.example.model.enums.SpaceRoleEnum;
 import com.example.model.enums.SpaceTypeEnum;
-import com.example.service.SpaceService;
 import com.example.service.SpaceUserService;
 import com.example.service.UserService;
 import org.springframework.stereotype.Component;
@@ -63,7 +62,7 @@ public class SpaceUserAuthManager {
     /**
      * 根据空间和用户获取权限列表
      *
-     * @param space   空间
+     * @param space     空间
      * @param loginUser 用户
      * @return 权限列表
      */

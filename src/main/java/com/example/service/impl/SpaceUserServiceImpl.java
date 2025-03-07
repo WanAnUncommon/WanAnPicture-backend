@@ -51,6 +51,7 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
         ThrowUtils.throwIf(spaceUserAddRequest == null, ErrorCode.PARAM_ERROR, "参数为空");
         SpaceUser spaceUser = new SpaceUser();
         BeanUtil.copyProperties(spaceUserAddRequest, spaceUser);
+        spaceUser.setSpaceRole(SpaceRoleEnum.VIEWER.getValue());
         validSpaceUser(spaceUser, true);
         // 操作数据库
         boolean result = this.save(spaceUser);

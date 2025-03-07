@@ -203,7 +203,7 @@ public class PictureController {
             pictureQueryRequest.setNullSpaceId(true);
             // 普通用户，只能查审核通过的
             pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
-        } else { // 仅空间所有人可以查看图片
+        } else {
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH);
         }

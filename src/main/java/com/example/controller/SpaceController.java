@@ -8,7 +8,6 @@ import com.example.common.BaseResponse;
 import com.example.common.DeleteRequest;
 import com.example.common.ResultUtils;
 import com.example.constant.UserConstant;
-import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
 import com.example.exception.ThrowUtils;
 import com.example.manager.auth.SpaceUserAuthManager;

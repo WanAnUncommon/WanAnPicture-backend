@@ -101,7 +101,7 @@ public class SpaceUserController {
     @PostMapping("/list")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<List<SpaceUserVO>> listSpaceUserVOList(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
-        ThrowUtils.throwIf(ObjectUtil.isEmpty(spaceUserQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
+        ThrowUtils.throwIf(ObjectUtil.isNull(spaceUserQueryRequest), ErrorCode.PARAM_ERROR, "参数为空");
         List<SpaceUser> spaceUserList = spaceUserService.list(spaceUserService.getQueryWrapper(spaceUserQueryRequest));
         List<SpaceUserVO> spaceUserVOList = spaceUserService.getSpaceUserVOList(spaceUserList);
         return ResultUtils.success(spaceUserVOList);

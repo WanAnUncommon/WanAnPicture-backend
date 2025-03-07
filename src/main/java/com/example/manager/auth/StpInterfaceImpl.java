@@ -1,4 +1,4 @@
-package com.yupi.yupicturebackend.manager.auth;
+package com.example.manager.auth;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.hutool.core.bean.BeanUtil;
@@ -12,9 +12,6 @@ import cn.hutool.http.Header;
 import cn.hutool.json.JSONUtil;
 import com.example.exception.BusinessException;
 import com.example.exception.ErrorCode;
-import com.example.manager.auth.SpaceUserAuthContext;
-import com.example.manager.auth.SpaceUserAuthManager;
-import com.example.manager.auth.StpKit;
 import com.example.manager.auth.model.SpaceUserPermissionConstant;
 import com.example.model.entity.Picture;
 import com.example.model.entity.Space;

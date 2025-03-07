@@ -1,6 +1,5 @@
 package com.example.service.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -44,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         ThrowUtils.throwIf(userAccount.length() < 4, ErrorCode.PARAM_ERROR, "账号小于4位");
         // 账号唯一校验
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount",userAccount);
+        queryWrapper.eq("userAccount", userAccount);
         long count = this.count(queryWrapper);
         ThrowUtils.throwIf(count > 0, ErrorCode.PARAM_ERROR, "账号已存在");
         // 保存
@@ -72,39 +71,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = this.getOne(new QueryWrapper<User>().eq("userAccount", userAccount));
         ThrowUtils.throwIf(user == null, ErrorCode.PARAM_ERROR, "账号不存在");
         ThrowUtils.throwIf(!user.getUserPassword().equals(getEncryptPassword(userPassword)), ErrorCode.PARAM_ERROR, "密码错误");
-        // 脱敏
-        LoginUserVO loginUserVO = getLoginUserVO(user);
         // 保存用户登录态
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, loginUserVO);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         // Sa-Token登录
         StpKit.SPACE.login(user.getId());
-        StpUtil.getSession().set(UserConstant.USER_LOGIN_STATE, loginUserVO);
-        return loginUserVO;
+        StpKit.SPACE.getSession().set(UserConstant.USER_LOGIN_STATE, user);
+        return getLoginUserVO(user);
     }
 
     @Override
     public LoginUserVO getLoginUserVO(User user) {
-        if (user == null){
+        if (user == null) {
             return null;
         }
         LoginUserVO loginUserVO = new LoginUserVO();
-        BeanUtil.copyProperties(user,loginUserVO);
+        BeanUtil.copyProperties(user, loginUserVO);
         return loginUserVO;
     }
 
     @Override
     public UserVO getUserVO(User user) {
-        if (user == null){
+        if (user == null) {
             return null;
         }
         UserVO userVO = new UserVO();
-        BeanUtil.copyProperties(user,userVO);
+        BeanUtil.copyProperties(user, userVO);
         return userVO;
     }
 
     @Override
     public List<UserVO> getUserVOList(List<User> userList) {
-        if (CollUtil.isEmpty(userList)){
+        if (CollUtil.isEmpty(userList)) {
             return new ArrayList<>();
         }
         return userList.stream().map(this::getUserVO).collect(Collectors.toList());
@@ -113,22 +110,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getLoginUser(HttpServletRequest request) {
         Object attribute = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
-        LoginUserVO loginUserVO = (LoginUserVO) attribute;
-        ThrowUtils.throwIf(loginUserVO == null,ErrorCode.NOT_LOGIN);
-        User user = this.getById(loginUserVO.getId());
-        ThrowUtils.throwIf(user == null,ErrorCode.NOT_LOGIN);
-        return user;
+        User loginUser = (User) attribute;
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN);
+        return loginUser;
     }
 
     @Override
     public long userLogout(HttpServletRequest request) {
         // 判断是否登录
         Object attribute = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
-        LoginUserVO loginUserVO = (LoginUserVO) attribute;
-        ThrowUtils.throwIf(loginUserVO == null,ErrorCode.NOT_LOGIN);
+        User loginUser = (User) attribute;
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN);
         // 移除登录态
         request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
-        return loginUserVO.getId();
+        return loginUser.getId();
     }
 
     @Override
@@ -152,14 +147,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public long addUser(User user) {
-        ThrowUtils.throwIf(user == null,ErrorCode.PARAM_ERROR,"参数为空");
+        ThrowUtils.throwIf(user == null, ErrorCode.PARAM_ERROR, "参数为空");
         // 参数校验
-        ThrowUtils.throwIf(CharSequenceUtil.hasBlank(user.getUserAccount(), user.getUserPassword(),user.getUserName()), ErrorCode.PARAM_ERROR, "参数为空");
+        ThrowUtils.throwIf(CharSequenceUtil.hasBlank(user.getUserAccount(), user.getUserPassword(), user.getUserName()), ErrorCode.PARAM_ERROR, "参数为空");
         ThrowUtils.throwIf(user.getUserPassword().length() < 8, ErrorCode.PARAM_ERROR, "密码小于8位");
         ThrowUtils.throwIf(user.getUserAccount().length() < 4, ErrorCode.PARAM_ERROR, "账号小于4位");
         // 账号唯一校验
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount",user.getUserAccount());
+        queryWrapper.eq("userAccount", user.getUserAccount());
         long count = this.count(queryWrapper);
         ThrowUtils.throwIf(count > 0, ErrorCode.PARAM_ERROR, "账号已存在");
         boolean saved = this.save(user);
@@ -169,13 +164,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public long updateUser(User user) {
-        ThrowUtils.throwIf(user == null || user.getId() == null,ErrorCode.PARAM_ERROR,"参数为空");
+        ThrowUtils.throwIf(user == null || user.getId() == null, ErrorCode.PARAM_ERROR, "参数为空");
         // 参数校验
-        ThrowUtils.throwIf(user.getUserPassword()!=null&&user.getUserPassword().length() < 8, ErrorCode.PARAM_ERROR, "密码小于8位");
-        ThrowUtils.throwIf(user.getUserAccount()!=null&&user.getUserAccount().length() < 4, ErrorCode.PARAM_ERROR, "账号小于4位");
+        ThrowUtils.throwIf(user.getUserPassword() != null && user.getUserPassword().length() < 8, ErrorCode.PARAM_ERROR, "密码小于8位");
+        ThrowUtils.throwIf(user.getUserAccount() != null && user.getUserAccount().length() < 4, ErrorCode.PARAM_ERROR, "账号小于4位");
         // 账号唯一校验
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount",user.getUserAccount());
+        queryWrapper.eq("userAccount", user.getUserAccount());
         long count = this.count(queryWrapper);
         ThrowUtils.throwIf(count > 0, ErrorCode.PARAM_ERROR, "账号已存在");
         boolean result = this.updateById(user);
@@ -189,14 +184,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Page<User> page = this.page(new Page<>(userQueryDTO.getCurrentPage(), userQueryDTO.getPageSize()), queryWrapper);
         List<User> records = page.getRecords();
         List<UserVO> userVOList = getUserVOList(records);
-        Page<UserVO> userVOPage =new Page<>(userQueryDTO.getCurrentPage(),userQueryDTO.getPageSize(), page.getTotal());
+        Page<UserVO> userVOPage = new Page<>(userQueryDTO.getCurrentPage(), userQueryDTO.getPageSize(), page.getTotal());
         userVOPage.setRecords(userVOList);
         return userVOPage;
     }
 
     @Override
     public boolean isAdmin(User user) {
-        if (user == null){
+        if (user == null) {
             return false;
         }
         return UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
