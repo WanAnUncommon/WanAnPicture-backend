@@ -96,10 +96,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         if (spaceId != null) {
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(ObjectUtil.isNull(space), ErrorCode.NOT_FOUND, "空间不存在");
-            // 仅空间所有人可以上传图片
-            ThrowUtils.throwIf(!loginUser.getId().equals(space.getUserId()), ErrorCode.NO_AUTH);
             // 空间限额校验
-            ThrowUtils.throwIf(space.getTotalCount() >= space.getMaxCount(), ErrorCode.NO_AUTH, "空间图片数量已达上限");
+            ThrowUtils.throwIf(space.getTotalCount() >=
+                    space.getMaxCount(), ErrorCode.NO_AUTH, "空间图片数量已达上限");
         }
         // 判断是否是更新
         Long pictureId = pictureUploadRequest.getId();
@@ -108,10 +107,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             // 判断图片是否存在
             Picture oldPicture = this.getById(pictureId);
             ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND, "图片不存在");
-            // 仅自己或管理员可以更新
-            if (!loginUser.getId().equals(oldPicture.getUserId()) && !userService.isAdmin(loginUser)) {
-                throw new BusinessException(ErrorCode.NO_AUTH);
-            }
             // spaceId
             if (spaceId == null) {
                 spaceId = oldPicture.getSpaceId();

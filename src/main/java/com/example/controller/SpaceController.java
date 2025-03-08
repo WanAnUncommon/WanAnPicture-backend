@@ -2,6 +2,7 @@ package com.example.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.annotation.AuthCheck;
 import com.example.common.BaseResponse;
@@ -13,12 +14,15 @@ import com.example.exception.ThrowUtils;
 import com.example.manager.auth.SpaceUserAuthManager;
 import com.example.model.dto.space.*;
 import com.example.model.entity.Space;
+import com.example.model.entity.SpaceUser;
 import com.example.model.entity.User;
 import com.example.model.enums.SpaceLevelEnum;
 import com.example.model.vo.SpaceVO;
 import com.example.service.SpaceService;
+import com.example.service.SpaceUserService;
 import com.example.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -45,6 +49,12 @@ public class SpaceController {
 
     @Resource
     private SpaceUserAuthManager spaceUserAuthManager;
+
+    @Resource
+    private SpaceUserService spaceUserService;
+
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     /**
      * 添加空间
@@ -75,9 +85,16 @@ public class SpaceController {
         User loginUser = userService.getLoginUser(request);
         Space space = spaceService.getById(deleteRequest.getId());
         spaceService.checkSpaceAuth(loginUser, space);
-        boolean result = spaceService.removeById(deleteRequest.getId());
-        ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除失败");
-        return ResultUtils.success(result);
+        transactionTemplate.execute(status -> {
+            // 删除空间
+            boolean result = spaceService.removeById(deleteRequest.getId());
+            ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除空间失败");
+            // 删除空间用户
+            result = spaceUserService.remove(new QueryWrapper<SpaceUser>().eq("spaceId", deleteRequest.getId()));
+            ThrowUtils.throwIf(!result, ErrorCode.SYSTEM_ERROR, "删除空间用户失败");
+            return ResultUtils.success(result);
+        });
+        return ResultUtils.success(true);
     }
 
     /**
